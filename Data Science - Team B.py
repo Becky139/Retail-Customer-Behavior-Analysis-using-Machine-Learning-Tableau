@@ -4,98 +4,91 @@ Created on Tue Apr 29 11:22:49 2025
 
 @author: Dell Laptop
 """
-#importing all the required libraries
+# === 1. IMPORT LIBRARIES ===
+import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import pandas as pd
 import seaborn as sns
 import gc
 import calendar
 from sklearn.impute import KNNImputer
 from sklearn.preprocessing import LabelEncoder
-#reading csv data into spyder IDE
-ds= pd.read_csv("D:\DS\Project\data\data.csv")
 
+# === 2. LOAD DATA ===
+file_path = "D:\DS\Project\data\data.csv"
+ds = pd.read_csv(file_path)
+
+# === 3. INITIAL EXPLORATION ===
 print(ds.head())
 print(ds.info())
-print(len(ds))
 print(ds.describe())
-ds.isnull().sum()
-print(ds.tail())
-print(ds.sample(4))
-print(ds.isnull().sum())
+print(f"Total rows: {len(ds)}")
+print("Missing values per column:\n", ds.isnull().sum())
+print("Duplicated rows:", ds.duplicated().sum())
 
-print(ds.duplicated().sum())
+# === 4. DROP DUPLICATES ===
+ds = ds.drop_duplicates().reset_index(drop=True)
 
-ds1 = ds.drop_duplicates()
-print(ds1.duplicated().sum())
-ds1.isnull().sum()
-list(ds1.columns.values)
+# === 5. DROP UNUSED COLUMNS ===
+cols_to_drop = [
+    "Transaction_ID", "Name", "Email", "Phone", "Address", "Customer_Segment", 
+    "Date", "Time", "Feedback", "Shipping_Method", "Payment_Method", 
+    "Order_Status", "Ratings", "products"
+]
+ds = ds.drop(columns=cols_to_drop, errors='ignore')
 
-ds1.Age.mean()
-ds1.Age.min()
-ds1.Age.max()
-
-ds1.isnull().sum()
-#dropping columns
-cols_to_drop =["Transaction_ID", "Name", "Email", "Phone", "Address", 
-               "Customer_Segment", "Date", "Time", "Feedback", 
-                   "Shipping_Method", "Payment_Method", "Order_Status", 
-                   "Ratings", "products"]
-ds2 = ds1.drop (cols_to_drop, axis=1)
-
-list(ds1.columns.values)
-list(ds2.columns.values)
-
-ds2.to_csv('ds2.csv')
-
-ds.info()
-ds2.info()
-print(ds2.head(20))
-object_cols = list(ds2.select_dtypes(include=['category','object']))
-print(object_cols)
-
-
-# FILL MISSING VALUES
-#----------------------------
-
-#Remap Income and Month
+# === 6. MANUAL ENCODING ===
 income_map = {'Low': 1, 'Medium': 2, 'High': 3}
-ds['Income'] = ds['Income'].map(income_map)
+month_map = {
+    'January': 1, 'February': 2, 'March': 3, 'April': 4, 'May': 5,
+    'June': 6, 'July': 7, 'August': 8, 'September': 9, 
+    'October': 10, 'November': 11, 'December': 12
+}
 
-month_map = {'January': 1, 'February': 2, 'March': 3, 'April': 4, 'May': 5, 
-             'June': 6, 'July': 7, 'August': 8, 'September': 9, 'October': 10, 
-             'November': 11, 'December': 12}
+ds['Income'] = ds['Income'].map(income_map)
 ds['Month'] = ds['Month'].map(month_map)
 
-ds.head()
-
-# Encode object columns temporarily
+# === 7. TEMPORARY LABEL ENCODING FOR IMPUTATION ===
 df_encoded = ds.copy()
 label_encoders = {}
 
-for col in df_encoded.select_dtypes(include='object').columns:
+for col in df_encoded.select_dtypes(include='object'):
     le = LabelEncoder()
     df_encoded[col] = df_encoded[col].astype(str)  # Treat NaNs as 'nan'
     df_encoded[col] = le.fit_transform(df_encoded[col])
     label_encoders[col] = le
-    
-    
-# Apply KNN Imputer
-imputer = KNNImputer(n_neighbors=5)
-df_imputed_array = imputer.fit_transform(df_encoded)
-df_imputed = pd.DataFrame(df_imputed_array, columns=ds.columns)
 
-# Decode label-encoded columns back to original values
-for col in label_encoders:
-    le = label_encoders[col]
+# === 8. APPLY KNN IMPUTER ===
+imputer = KNNImputer(n_neighbors=5)
+imputed_array = imputer.fit_transform(df_encoded)
+df_imputed = pd.DataFrame(imputed_array, columns=df_encoded.columns)
+
+# === 9. DECODE BACK TO ORIGINAL CATEGORIES ===
+for col, le in label_encoders.items():
     df_imputed[col] = df_imputed[col].round().astype(int)
     df_imputed[col] = le.inverse_transform(df_imputed[col])
-    
-df_imputed.info()
-df_imputed.head()
-    
-    
+
+# === 10. FINAL LABEL ENCODING FOR MODELING ===
+df_final = df_imputed.copy()
+label_encoders_final = {}
+
+for col in df_final.select_dtypes(include='object'):
+    le = LabelEncoder()
+    df_final[col] = df_final[col].astype(str)
+    df_final[col] = le.fit_transform(df_final[col])
+    label_encoders_final[col] = le
+
+# === 11. SAVE FINAL CLEANED DATA ===
+df_final.to_csv("cleaned_data_final.csv", index=False)
+
+# === 12. OPTIONAL: CLEANUP MEMORY ===
+gc.collect()
+
+# === 13. FINAL CHECK ===
+print("Final cleaned dataset info:")
+print(df_final.info())
+print(df_final.head())
+        
 
 
 
