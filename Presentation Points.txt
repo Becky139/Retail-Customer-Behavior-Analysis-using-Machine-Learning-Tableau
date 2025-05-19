@@ -1,0 +1,41 @@
+Presentation Points
+
+Slide 1: Introduction
+Project Focus: Customer Sales Analysis using Machine Learning and Tableau.
+
+Team: Team B – Rebecca Marriott, Nouman Mehar, Suneeta Vota.
+
+Goal: Leverage data-driven insights to understand customer purchasing behavior.
+
+Slide 2: Project – Customer Purchasing
+Purpose: Utilize data science within ERP systems to enhance personalized customer experiences.
+
+Approach: Analyze customer data like purchase history, behavior, and demographics.
+
+Benefits: Improved marketing strategies, personalized recommendations, increased customer satisfaction.
+
+Project Objective: Predict customer gender using shopping behavior and other dataset features.
+
+Techniques Used: Machine Learning for prediction and pattern discovery.
+
+Slide 3: Dataset Overview
+Customer Info: Includes ID, name, contact details, age, gender, income, and segment (Premium, Regular, New).
+
+Transaction Data: Covers transaction ID, last purchase date, purchase history, feedback, shipping, and payment methods.
+
+Product Details: Includes product category, brand, and type (e.g., electronics, clothing, grocery).
+
+Volume: 302,010 records with 30 features.
+
+Slide 4: Dataset Insights
+Geographic Scope: Data from USA, UK, Canada, Australia, and Germany.
+
+Temporal Attributes: Separate fields for purchase year, month, date, and time enable trend analysis.
+
+Data Quality Considerations: Data Pre processing Nouman Meher
+
+Presence of null values distributed across records.
+
+Duplicate entries need handling during preprocessing.
+
+Data Cleaning Required: Necessary to ensure model accuracy and reliability.
